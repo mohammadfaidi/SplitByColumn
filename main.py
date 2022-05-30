@@ -5,6 +5,8 @@ import argparse
 import glob
 
 
+
+
 class ETL:
 
     # requirement1:Remove all empty lines
@@ -13,7 +15,7 @@ class ETL:
         if os.path.exists("req1.csv"):
             os.remove("req1.csv")
         else:
-            df = pd.read_csv('datafile.csv')
+            df = pd.read_csv('datafile.csv',skiprows = [1, 3, 4])
             df.dropna(how="all", inplace=True)
             df.to_csv("req1.csv", index=False)
             print("Done")
@@ -24,10 +26,11 @@ class ETL:
         if os.path.exists("req2.csv"):
             os.remove("req2.csv")
         else:
-            df = pd.read_csv('req1.csv')
-            replaced_data = df.replace(np.nan, "NA")
+            df = pd.read_csv('req1.csv',skiprows = [1, 3, 4])
+            #replaced_data = df.replace(np.nan, "NA")
+            replaced_data=df.fillna('NA', inplace=True)
             print(replaced_data)
-            replaced_data.to_csv("req2.csv", index=False)
+            df.to_csv("req2.csv", index=False)
             print("Done")
 
     # requirement3:Delete all duplicate row
@@ -36,11 +39,12 @@ class ETL:
         if os.path.exists("req3.csv"):
             os.remove("req3.csv")
         else:
-            df = pd.read_csv('req2.csv')
+            df = pd.read_csv('req2.csv',skiprows = [1, 3, 4])
             print(",,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,")
             size = len(df)
             print("Print Length Of Rows Before Remove Duplicate: {}".format(size))
             remove_dup_data = df.drop_duplicates(subset="PG", keep=False, inplace=True)
+
             df.to_csv("req3.csv", index=False)
             size = len(df)
             print("Print Length Of Rows After Remove Duplicate: {}".format(size))
@@ -57,7 +61,7 @@ class ETL:
                     print("Error while deleting file : ", filePath)
         else:
             if os.path.exists("req3.csv"):
-                df = pd.read_csv('req3.csv')
+                df = pd.read_csv('req3.csv',skiprows = [1, 3, 4])
                 column = df.columns.values
                 sel_col = column[no]
                 unique_data = df[sel_col].unique()
@@ -95,6 +99,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
     print(args.numberCol)
     b = args.numberCol
+    b = b - 1
     if 0 <= b <= 4:
         ETL.remove_empty_lines()
         ETL.replace_empty_values()
